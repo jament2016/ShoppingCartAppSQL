@@ -69,10 +69,7 @@ public class AccountDB {
 			
 			br.close();
 			fr.close();
-			
-			System.out.println("conn=" + conn);
-			System.out.println("user="+user);
-			System.out.println("pass="+pass);
+
 		
 			
 			con=DriverManager.getConnection(conn,user, pass);
