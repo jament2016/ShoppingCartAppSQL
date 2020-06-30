@@ -11,6 +11,8 @@ import java.util.List;
 import javax.swing.WindowConstants;
 
 import com.cop4331.shopping_cart_app.App;
+import com.cop4331.shopping_cart_app.databases.AccountDB;
+import com.cop4331.shopping_cart_app.databases.ItemDB;
 import com.cop4331.shopping_cart_app.graphics.Window;
 
 /**
@@ -30,6 +32,7 @@ public class WindowManager {
 		createNewWindow(0);
 		
 		getMainWindow().setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
+		
 	}
 	
 	
@@ -79,6 +82,16 @@ public class WindowManager {
             @Override
             public void windowClosing(WindowEvent e)
             {
+            	System.out.println("Page Number: " +pageIndex);
+            	if(pageIndex!=6) {
+            		if(pageIndex!=7) {
+            			if(pageIndex!=4) {
+		            		super.windowClosing(e);
+							AccountDB.getInstance().close();
+							ItemDB.getInstance().close();
+            			}
+            		}
+            	}
                 System.out.println("A window had been closed");
                 windows.remove(e.getWindow());
                 e.getWindow().dispose();

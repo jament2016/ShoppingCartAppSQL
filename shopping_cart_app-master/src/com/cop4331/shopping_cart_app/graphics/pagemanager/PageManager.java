@@ -13,6 +13,7 @@ import com.cop4331.shopping_cart_app.graphics.pages.CheckOutPage;
 import com.cop4331.shopping_cart_app.graphics.pages.DescriptionPage;
 import com.cop4331.shopping_cart_app.graphics.pages.InventoryPage;
 import com.cop4331.shopping_cart_app.graphics.pages.LoginPage;
+import com.cop4331.shopping_cart_app.graphics.pages.NewUserPage;
 import com.cop4331.shopping_cart_app.graphics.pages.ShoppingPage;
 
 /**
@@ -40,6 +41,7 @@ public class PageManager {
 		//seller
 		LoadPage(new InventoryPage());
 		LoadPage(new AddItemPage());
+		LoadPage(new NewUserPage());
 	}
 	
 	/**

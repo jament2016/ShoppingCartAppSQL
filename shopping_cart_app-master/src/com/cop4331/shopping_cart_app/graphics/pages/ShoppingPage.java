@@ -232,7 +232,7 @@ public class ShoppingPage extends Page {
 		});
 		
 		System.out.println("seller name= "+i.getSellerID());
-		JLabel sellerName = new JLabel(AccountDB.getInstance().getAccount(i.getSellerID()).getUsername(), SwingConstants.CENTER);
+		JLabel sellerName = new JLabel(AccountDB.getInstance().getAccount(i.getSellerID()-1).getUsername(), SwingConstants.CENTER);
 		item.add(sellerName);
 		
 		JLabel quantity = new JLabel(Integer.toString(i.getQuantity()), SwingConstants.CENTER);

@@ -1,12 +1,15 @@
 package com.cop4331.shopping_cart_app.databases;
 
+import java.io.BufferedReader;
 import java.io.File;
+import java.io.FileReader;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
+import java.util.Scanner;
 
 import com.cop4331.shopping_cart_app.account.Account;
 import com.cop4331.shopping_cart_app.account.Customer;
@@ -36,26 +39,73 @@ public class AccountDB {
     public AccountDB() {
     	this.currentAccount_ID = -1;
     	connect();
-		loadAccounts();
+    	loadAccounts();
 		
     }
     
     public void connect() {
+    	boolean fail=false;
 		try {
-			Class.forName("com.mysql.jdbc.Driver");
-			System.out.println("Successful connection");
+			Class.forName("oracle.jdbc.driver.OracleDriver");
 			
-			con=DriverManager.getConnection("jdbc:mysql://localhost:3306/shoppingcartapp","root","");
+			String conn="";
+			String user="";
+			String pass="";
+			File f=new File("lib/Conn.txt");
+			FileReader fr=new FileReader(f);
+			BufferedReader br=new BufferedReader(fr);
+			String line;
+			int i=0;
+			
+			while((line=br.readLine())!=null) {
+				if(i==0) 
+					conn=line;
+				else if(i==1)
+					user=line;
+				else if(i==2)
+					pass=line;
+				i++;
+			}
+			
+			br.close();
+			fr.close();
+			
+			System.out.println("conn=" + conn);
+			System.out.println("user="+user);
+			System.out.println("pass="+pass);
+		
+			
+			con=DriverManager.getConnection(conn,user, pass);
+			System.out.println("Connection");
 			st=con.createStatement();
 			a=con.createStatement();
 			b=con.createStatement();
 			c=con.createStatement();
 			d=con.createStatement();
+			
+
 		}
 		catch (Exception e) {
+			fail=true;
 			e.printStackTrace();
 		}
 	}
+    
+    public void close() {
+    	try {
+    		System.out.println("Closing Account Connections...");
+			rs.close();
+			st.close();
+			con.close();
+			a.close();
+			b.close();
+			c.close();
+			d.close();
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+    }
     
     public void addRev(double price, int itemID) {
     	String sellerID=Integer.toString(ItemDB.getInstance().getItem(itemID).getSellerID());
@@ -98,6 +148,7 @@ public class AccountDB {
      * forces creates the INSTANCE
      */
     public static void init() {
+    	
     	getInstance();
     }
     
@@ -179,8 +230,9 @@ public class AccountDB {
     private void loadAccounts() {
     	accounts=new ArrayList<Account>();
     	String query="select * from account";
+    	System.out.println(query);
     	try {
-    		rs=st.executeQuery(query);
+    		rs=st.executeQuery("select * from account");
 
     		String username;
     		String password;
@@ -188,17 +240,17 @@ public class AccountDB {
     		int id;
     		
     		while(rs.next()) {
+    			System.out.println("result" + rs.getString("username"));
     			int i=0;
     			username=rs.getString("username");
     			password=rs.getString("Password");
     			id=Integer.parseInt(rs.getString("id"));
-    			
-    			
+    			System.out.println(username + password + id);
     			if(rs.getString("acc_type").equals("seller")) {
-    				System.out.println("is seller");
+    				
     				//need to add revenue and cost
     				
-    				String sql="select * from seller where id="+Integer.toString(id-1);
+    				String sql="select * from seller where id="+Integer.toString(id);
     				System.out.println("sql: " + sql);
     				
     				ResultSet q=a.executeQuery(sql);
@@ -208,8 +260,7 @@ public class AccountDB {
     					cost=Double.parseDouble(q.getString("cost"));
     					revenue=Double.parseDouble(q.getString("revenue"));
     				}   				
-    				
-    				accounts.add(new Seller(username, password, cost, revenue));
+    				accounts.add(new Seller(username, password, revenue, cost));
     			}
     			
     			//needs to load the cart
@@ -218,7 +269,7 @@ public class AccountDB {
     				String itemID="";
     				String quantity="";
     				String cart="";
-    				String sql="select * from cart where customerID="+Integer.toString(id-1);
+    				String sql="select * from cart where customerID="+Integer.toString(id);
     				System.out.println("sql: "+sql);
     				ResultSet r=b.executeQuery(sql);
 	    			while(r.next()) {
@@ -237,27 +288,41 @@ public class AccountDB {
     	}
     	catch(Exception e) {
     		e.printStackTrace();
+    		
     	}
-    	if(accounts.isEmpty())
-			createInitialAccounts();
+    	
+    	if(accounts.isEmpty()) {
+    		createInitialAccounts();
+    	}
+    	
+    	System.out.println("Total accounts: "+ accounts.size());
     	
     }
     
     public void createInitialAccounts() {
 		// TODO Auto-generated method stub
-		String sql="Create table account(username varchar30, password varchar30, acc_type varchar30, id int NOT NULL AUTO_INCREMENT)";
+		String sql="create table account(username VARCHAR2(15), password VARCHAR2(15),"
+				+ " acc_type VARCHAR2(15), id NUMBER generated by default on null as identity, PRIMARY KEY(id))";
+		
 		try {
+			st.execute(sql);
+			sql="create table cart(customerID number, itemID number, quantity number)";
+			st.execute(sql);
+			sql="create table seller(id number, revenue binary_float, cost binary_float)";
+			st.execute(sql);
 			
+			sql="insert into account values ('justin','1234','seller',0)";
+			st.execute(sql);
 			sql="insert into account(username, password, acc_type) values('justinbuyer', '1234', 'buyer')";
 			st.execute(sql);
 			//sellers id = 2
 			sql="insert into account(username, password, acc_type) values('justinseller', '1234', 'seller')";
 			st.execute(sql);
-			sql="insert into seller(id, revenue, cost) values(2, 0, 0)";
+			sql="insert into seller values (2,0,0)";
 			st.execute(sql);
 			
-		} catch (SQLException e) {
-			// TODO Auto-generated catch block
+		}
+		catch(Exception e) {
 			e.printStackTrace();
 		}
 		loadAccounts();
@@ -289,6 +354,8 @@ public class AccountDB {
 		String query;
 		String sql="select * from cart";
 		boolean exists=false;
+		System.out.println("Current customerID = "+id);
+		System.out.println("Item Id Adding: "+itemID+" quantity: "+add);
 		try {
 			rs=st.executeQuery(sql);
 			while(rs.next()) {
@@ -313,6 +380,29 @@ public class AccountDB {
 		}
 	}
 
+	public void createAccount(String username, String password, String acc_type) {
+		String sql;
+		String query;
+		
+		//acc type has to be buyer or seller
+		try {
+			sql="Insert into account values('"+username+"', '"+password+"', '"+acc_type+"',null)";
+			st.execute(sql);
+			if("acc_type".equals("seller")) {
+				query="select id from account where username='"+username+"'";
+				rs=st.executeQuery(sql);
+				while(rs.next()) {
+					int id=Integer.parseInt(rs.getString("id"));
+					sql="insert into seller values("+id+",0,0)";
+				}
+			}
+		}
+		catch (Exception e) {
+			e.printStackTrace();
+		}
+	}
+	
+	
 	public void clearCart() {
 		// TODO Auto-generated method stub
 		String sql="Delete from cart where customerID="+Integer.toString(currentAccount_ID);
@@ -322,5 +412,14 @@ public class AccountDB {
 		catch(Exception e) {
 			
 		}
+	}
+
+	public boolean checkExists(String username) {
+		// TODO Auto-generated method stub
+		for(int i=0; i<accounts.size(); i++) {
+			if(accounts.get(i).getUsername().equals(username))
+				return true;
+		}
+		return false;
 	}
 }

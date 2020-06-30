@@ -90,7 +90,7 @@ public class CheckOutPage extends Page {
 					int qual = oldcart.get(keyset[i]);
 					
 					int new_quantity = ItemDB.getInstance().getItem(itemID).getQuantity() - qual;
-					
+					System.out.println("New Item quantity: "+ new_quantity);
 					if(new_quantity < 0) {
 						new_quantity = 0;
 						System.err.println("the new quantity is negative... how?");
@@ -267,7 +267,7 @@ public class CheckOutPage extends Page {
 		JLabel itemName = new JLabel(i.getName(), SwingConstants.CENTER);
 		item.add(itemName);
 		
-		JLabel sellerName = new JLabel(AccountDB.getInstance().getAccount(i.getSellerID()).getUsername(), SwingConstants.CENTER);
+		JLabel sellerName = new JLabel(AccountDB.getInstance().getAccount(i.getSellerID()-1).getUsername(), SwingConstants.CENTER);
 		item.add(sellerName);
 		
 		JLabel quantity = new JLabel(Integer.toString(qual), SwingConstants.CENTER);

@@ -22,6 +22,7 @@ import com.cop4331.shopping_cart_app.account.Account;
 import com.cop4331.shopping_cart_app.account.Customer;
 import com.cop4331.shopping_cart_app.databases.AccountDB;
 import com.cop4331.shopping_cart_app.graphics.Page;
+import com.cop4331.shopping_cart_app.graphics.windowmanager.WindowManager;
 
 /**
  * @author mmena2017
@@ -62,11 +63,14 @@ public class LoginPage extends Page {
 		passField.setHorizontalAlignment(JPasswordField.CENTER);
 		
 		//OPTIONAL adjust text size
-		Font loginFont=new Font("SansSerif",Font.BOLD, 25);
+		Font loginFont=new Font("SansSerif",Font.PLAIN, 45);
 		userField.setFont(loginFont);
+		passField.setFont(loginFont);
 		JButton loginBtn = new JButton();
+		JButton newUser=new JButton();
 		
 		loginBtn.setText("Login");
+		
 		
 		loginBtn.addActionListener(new ActionListener() {
 
@@ -85,6 +89,7 @@ public class LoginPage extends Page {
 					
 					AccountDB.getInstance().currentAccount_ID = accountID;
 					
+					
 					if(a instanceof Customer)
 						getWindow().SetPage(1);
 					else
@@ -96,10 +101,34 @@ public class LoginPage extends Page {
 			}
 		
 		});
-
+		
+		
+		newUser.setText("New User");
+		newUser.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent arg0) {
+				if(WindowManager.getInstance().count() > 1) {
+					System.err.println("you are already adding an item!");
+					return;
+				}
+				
+				int popUpPageID = 7;
+				
+				WindowManager.getInstance().createNewWindow(popUpPageID, 500, 700);
+			}
+		});
+		
+		newUser.setPreferredSize(new Dimension(150,75));
+		loginBtn.setPreferredSize(new Dimension(150,75));
+		JPanel buttonPanel=new JPanel();
+		
+		buttonPanel.add(newUser);
+		buttonPanel.add(loginBtn);
+		
 		mainPanel.add(userField);
 		mainPanel.add(passField);
-		mainPanel.add(loginBtn);
+		mainPanel.add(buttonPanel);
+		//mainPanel.add(newUser);
 		add(mainPanel);
 	}
 	

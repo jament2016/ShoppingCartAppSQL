@@ -5,10 +5,13 @@ package com.cop4331.shopping_cart_app.graphics;
 
 import java.awt.Color;
 import java.awt.HeadlessException;
+import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 
 import javax.swing.JFrame;
 
+import com.cop4331.shopping_cart_app.databases.AccountDB;
+import com.cop4331.shopping_cart_app.databases.ItemDB;
 import com.cop4331.shopping_cart_app.graphics.pagemanager.PageManager;
 
 /**
@@ -21,6 +24,8 @@ public class Window extends JFrame {
 	 * 
 	 */
 	int currentPage = 0;
+	
+	
 	private static final long serialVersionUID = 1L;
 	/**
 	 * @throws HeadlessException
@@ -32,6 +37,7 @@ public class Window extends JFrame {
 		
 		
 	}
+	
 	/**
 	 * @param arg0
 	 * @throws HeadlessException
